@@ -62,7 +62,7 @@ function AppTodo() {
       description,
       done: false,
       created: Date.now(),
-      timeSpent: 0,
+      timeSpent: 1,
       isRunning: false,
     };
     setTasks((prev) => [...prev, newTask]);
