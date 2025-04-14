@@ -13,7 +13,7 @@ export default function Task({
   onStopEditing,
   onStartTimer,
   onStopTimer,
-  timeSpent,
+  timeLeft,
   created,
 }) {
   const [editText, setEditText] = useState(description);
@@ -71,7 +71,7 @@ export default function Task({
             <span className="created">
               <button className="icon icon-play" onClick={onStartTimer}></button>
               <button className="icon icon-pause" onClick={onStopTimer}></button>
-              {formatTime(timeSpent)}
+              {formatTime(timeLeft)}
             </span>
             <span className="created">{formatDistanceToNow(new Date(created), { addSuffix: true })}</span>
           </label>

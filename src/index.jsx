@@ -7,9 +7,33 @@ import Footer from './components/Footer';
 import './index.css';
 
 const initialTasks = [
-  { id: 1, description: 'Completed task', done: true, created: Date.now(), timeSpent: 0, isRunning: false },
-  { id: 2, description: 'Editing task', done: false, created: Date.now(), timeSpent: 0, isRunning: false },
-  { id: 3, description: 'Active task', done: false, created: Date.now(), timeSpent: 0, isRunning: false },
+  {
+    id: 1,
+    description: 'Completed task',
+    done: true,
+    created: Date.now(),
+    isRunning: false,
+    timeLeft: 300,
+    initialTime: 300,
+  },
+  {
+    id: 2,
+    description: 'Editing task',
+    done: false,
+    created: Date.now(),
+    isRunning: false,
+    timeLeft: 300,
+    initialTime: 300,
+  },
+  {
+    id: 3,
+    description: 'Active task',
+    done: false,
+    created: Date.now(),
+    isRunning: false,
+    timeLeft: 300,
+    initialTime: 300,
+  },
 ];
 
 function AppTodo() {
@@ -28,27 +52,43 @@ function AppTodo() {
   const startTimer = (id) => {
     if (timers.current[id]) return;
 
-    updateTasks(
-      (task) => task.id === id,
-      (task) => ({ ...task, isRunning: true })
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => {
+        if (task.id === id) {
+          const timeLeft = task.timeLeft <= 0 ? task.initialTime : task.timeLeft;
+          return { ...task, isRunning: true, timeLeft };
+        }
+        return task;
+      })
     );
 
     timers.current[id] = setInterval(() => {
-      updateTasks(
-        (task) => task.id === id,
-        (task) => ({ ...task, timeSpent: task.timeSpent + 1 })
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => {
+          if (task.id === id) {
+            const newTime = task.timeLeft - 1;
+
+            if (newTime <= 0) {
+              clearInterval(timers.current[id]);
+              delete timers.current[id];
+              return { ...task, timeLeft: 0, isRunning: false };
+            }
+
+            return { ...task, timeLeft: newTime };
+          }
+          return task;
+        })
       );
     }, 1000);
   };
 
   const stopTimer = (id) => {
+    if (!timers.current[id]) return;
+
     clearInterval(timers.current[id]);
     delete timers.current[id];
 
-    updateTasks(
-      (task) => task.id === id,
-      (task) => ({ ...task, isRunning: false })
-    );
+    setTasks((prevTasks) => prevTasks.map((task) => (task.id === id ? { ...task, isRunning: false } : task)));
   };
 
   const updateTasks = (filterFn, updateFn) => {
@@ -56,13 +96,14 @@ function AppTodo() {
     setAllTasks((prev) => prev.map((t) => (filterFn(t) ? updateFn(t) : t)));
   };
 
-  const addTask = (description) => {
+  const addTask = (description, min, sec) => {
     const newTask = {
       id: Date.now(),
       description,
       done: false,
       created: Date.now(),
-      timeSpent: 1,
+      timeLeft: Number(min) * 60 + Number(sec),
+      initialTime: Number(min) * 60 + Number(sec),
       isRunning: false,
     };
     setTasks((prev) => [...prev, newTask]);

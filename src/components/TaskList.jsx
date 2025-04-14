@@ -31,7 +31,7 @@ function TaskList({
           onStopEditing={onStopEditing}
           onStartTimer={() => onStartTimer(task.id)}
           onStopTimer={() => onStopTimer(task.id)}
-          timeSpent={task.timeSpent}
+          timeLeft={task.timeLeft}
         />
       ))}
     </ul>
